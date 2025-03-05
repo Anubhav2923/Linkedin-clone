@@ -6,7 +6,7 @@ import { sendCommentNotificationEmail } from '../emails/emailHandler.js';
 export const getFeedPosts = async (req, res) => {
     try{
         const posts = await Post.find({
-            author: {$in: req.user.connections}
+            author: {$in: [...req.user.connections,req.user._id]}
         })
         .populate('author','name profilePicture headline')
         .populate('comments.user', 'name profilePicture' )
@@ -37,7 +37,7 @@ export const createPost = async(req, res) => {
             newPost = new Post({
                 author: req.user._id,
                 content
-            })
+            });
         }
 
         await newPost.save();
@@ -142,10 +142,10 @@ export const createComment = async (req,res) => {
 export const likePost = async (req, res)=> {
     try{
         const postId = req.params.id;
-        const post = await Post.findByIdAndUpdate(postId);
+        const post = await Post.findById(postId);
         const userId = req.user._id;
 
-        if(post.likes.includes(uerId)){
+        if(post.likes.includes(userId)){
             //Unlike the post
             post.likes = post.likes.filter(id => id.toString() !== userId.toString())
         } else {
@@ -154,7 +154,7 @@ export const likePost = async (req, res)=> {
             
             //create a notification if the post owner is not the user who liked
 
-            if(post.author.toString() !== userId.toString()){
+            if(post.author._id.toString() !== userId._id.toString()){
                 const newNotification = new Notification({
                     recipient: post.author,
                     type: "like",

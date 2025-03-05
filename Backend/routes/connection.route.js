@@ -6,7 +6,7 @@ const router = express.Router();
 
 router.post('/request/:userId', protectRoute, sendConnectionRequest),
 router.put('/accept/:requestId', protectRoute, acceptConnectionRequest);
-router.put('/reject/:request:id', protectRoute, rejectConnectionRequest);
+router.put('/reject/:requestId', protectRoute, rejectConnectionRequest);
 
 // Get all connection requests for the current user
 router.get('/requests', protectRoute, getConnectionRequests)
